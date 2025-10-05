@@ -4,14 +4,13 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // ✅ Cho phép frontend gọi qua HTTPS
-  app.enableCors({
-    origin: '*',
-  });
+  app.enableCors({ origin: '*' });
 
-  // ✅ Railway cấp PORT ngẫu nhiên
-  const port = process.env.PORT || 8080;
+  // ✅ Railway cung cấp PORT qua biến môi trường
+  const port = process.env.PORT ? Number(process.env.PORT) : 8080;
+
   await app.listen(port, '0.0.0.0');
-  console.log(`Server is running on port ${port}`);
+  console.log(`✅ Server is running on http://0.0.0.0:${port}`);
+  console.log('ENV PORT =', process.env.PORT);
 }
 bootstrap();
