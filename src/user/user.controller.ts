@@ -267,7 +267,10 @@ export class UserController {
 
   // ========== ADD ITEM WEB ==========
   @Post('addItemWeb')
-  async addItemWeb(@Query('username') username: string, @Query('itemId') itemId: number) {
+  async addItemWeb(@Body() body: { username: string, itemId: number }) {
+    const { username, itemId } = body;
+    if (!username || itemId == null) throw new BadRequestException('username hoặc itemId không hợp lệ');
+
     const user = await this.userService.findByUsername(username);
     if (!user) throw new NotFoundException('User không tồn tại!');
 
