@@ -68,27 +68,26 @@ export class ItemController {
 
   // Thêm nhiều item (replace toàn bộ list)
   @Post('add-multiple/:username')
-  async addItems(@Param('username') username: string, @Body() items: Item[]) {
-    try {
-      const user = await this.userService.findByUsername(username);
-      if (!user) {
-        throw new HttpException('User không tồn tại!', HttpStatus.BAD_REQUEST);
-      }
-
-      // Xóa item cũ
-      await this.itemService.deleteByUser(user);
-
-      // Gán user cho từng item mới
-      items.forEach((item) => {
-        item.user = user;
-      });
-
-      return await this.itemService.saveAll(items);
-    } catch (e) {
-      throw new HttpException(
-        `Lỗi khi lưu item: ${e.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+async addItems(
+  @Param('username') username: string,
+  @Body() body: { items: Item[] }
+) {
+  const items = body.items;
+  if (!items || !Array.isArray(items)) {
+    throw new HttpException('Danh sách items không hợp lệ', HttpStatus.BAD_REQUEST);
   }
+
+  const user = await this.userService.findByUsername(username);
+  if (!user) {
+    throw new HttpException('User không tồn tại!', HttpStatus.BAD_REQUEST);
+  }
+
+  // Xóa item cũ
+  await this.itemService.deleteByUser(user);
+
+  // Gán user
+  items.forEach(item => item.user = user);
+
+  return await this.itemService.saveAll(items);
+}
 }
