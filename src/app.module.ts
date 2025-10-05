@@ -14,6 +14,9 @@ import { ItemModule } from './item/item.module';
       database: 'railway',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
+      ssl: {
+        rejectUnauthorized: false, // 👈 Cho phép chứng chỉ tự ký
+      },
     }),
     UserModule,
     ItemModule,
