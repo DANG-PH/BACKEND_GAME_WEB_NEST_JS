@@ -68,26 +68,50 @@ export class ItemController {
 
   // Thêm nhiều item (replace toàn bộ list)
   @Post('add-multiple/:username')
-async addItems(
-  @Param('username') username: string,
-  @Body() body: { items: Item[] }
-) {
-  const items = body.items;
-  if (!items || !Array.isArray(items)) {
-    throw new HttpException('Danh sách items không hợp lệ', HttpStatus.BAD_REQUEST);
+  async addItems(@Param('username') username: string, @Body() body: { items: any[] }) {
+    const items = body.items;
+    if (!items || !Array.isArray(items)) {
+      throw new HttpException('Danh sách items không hợp lệ', HttpStatus.BAD_REQUEST);
+    }
+
+    const user = await this.userService.findByUsername(username);
+    if (!user) {
+      throw new HttpException('User không tồn tại!', HttpStatus.BAD_REQUEST);
+    }
+
+    await this.itemService.deleteByUser(user);
+
+    const itemsToSave = items.map(item => {
+      // Parse chiso JSON string thành object
+      let chisoObj = {};
+      if (item.chiso) {
+        try {
+          chisoObj = JSON.parse(item.chiso);
+        } catch(e) {
+          chisoObj = {};
+        }
+      }
+
+      return this.itemService.create({
+        maItem: item.maItem,
+        ten: item.ten,
+        loai: item.loai,
+        moTa: item.moTa,
+        soLuong: item.soLuong,
+        hanhTinh: item.hanhTinh,
+        setKichHoat: item.setKichHoat,
+        soSaoPhaLe: item.soSaoPhaLe,
+        soSaoPhaLeCuongHoa: item.soSaoPhaLeCuongHoa,
+        soCap: item.soCap,
+        hanSuDung: item.hanSuDung,
+        sucManhYeuCau: item.sucManhYeuCau?.toString(), // chuyển long → string
+        linkTexture: item.linkTexture,
+        viTri: item.viTri,
+        chiso: chisoObj,
+        user: user,
+      });
+    });
+
+    return await this.itemService.saveAll(itemsToSave);
   }
-
-  const user = await this.userService.findByUsername(username);
-  if (!user) {
-    throw new HttpException('User không tồn tại!', HttpStatus.BAD_REQUEST);
-  }
-
-  // Xóa item cũ
-  await this.itemService.deleteByUser(user);
-
-  // Gán user
-  items.forEach(item => item.user = user);
-
-  return await this.itemService.saveAll(items);
-}
 }

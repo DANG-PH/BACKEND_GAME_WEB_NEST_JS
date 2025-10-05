@@ -38,4 +38,9 @@ export class ItemService {
   async deleteByUser(user: User): Promise<void> {
     await this.itemRepository.delete({ user });
   }
+
+   // Tạo entity từ object thuần
+  create(data: Partial<Item>): Item {
+    return this.itemRepository.create(data);
+  }
 }
