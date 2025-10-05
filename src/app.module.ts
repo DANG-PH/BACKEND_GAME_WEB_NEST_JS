@@ -5,20 +5,17 @@ import { ItemModule } from './item/item.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
-      useFactory: async () => {
-        console.log('Connecting to DB...');
-        return {
-          type: 'mysql',
-          host: 'mainline.proxy.rlwy.net',
-          port: 43854,
-          username: 'root',
-          password: 'jbDmmZTcPnWFkGzvTfYrXnippJzjeCbK',
-          database: 'railway',
-          entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-          synchronize: true,
-          ssl: { rejectUnauthorized: false },
-        };
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'mainline.proxy.rlwy.net',
+      port: 43854,
+      username: 'root',
+      password: 'jbDmmZTcPnWFkGzvTfYrXnippJzjeCbK',
+      database: 'railway',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
+      ssl: {
+        rejectUnauthorized: false, 
       },
     }),
     UserModule,
