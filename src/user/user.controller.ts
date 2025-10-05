@@ -271,7 +271,9 @@ export class UserController {
     const user = await this.userService.findByUsername(username);
     if (!user) throw new NotFoundException('User không tồn tại!');
 
+    if (!user.danhSachVatPhamWeb) user.danhSachVatPhamWeb = [];
     user.danhSachVatPhamWeb.push(itemId);
+
     await this.userService.saveUser(user);
 
     return `Đã thêm item ${itemId} cho user ${username}`;
