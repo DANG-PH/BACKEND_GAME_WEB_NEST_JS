@@ -82,7 +82,7 @@ export class ItemController {
     await this.itemService.deleteByUser(user);
 
     const itemsToSave = items.map(item => {
-      // Parse chiso JSON string thành object
+      // Parse chiso JSON string → object
       let chisoObj = {};
       if (item.chiso) {
         try {
@@ -93,25 +93,30 @@ export class ItemController {
       }
 
       return this.itemService.create({
-        maItem: item.maItem,
-        ten: item.ten,
-        loai: item.loai,
-        moTa: item.moTa,
-        soLuong: item.soLuong,
-        hanhTinh: item.hanhTinh,
-        setKichHoat: item.setKichHoat,
-        soSaoPhaLe: item.soSaoPhaLe,
-        soSaoPhaLeCuongHoa: item.soSaoPhaLeCuongHoa,
-        soCap: item.soCap,
-        hanSuDung: item.hanSuDung,
-        sucManhYeuCau: item.sucManhYeuCau?.toString(), // chuyển long → string
-        linkTexture: item.linkTexture,
-        viTri: item.viTri,
+        maItem: item.maItem || '',
+        ten: item.ten || '',
+        loai: item.loai || '',
+        moTa: item.moTa || '',
+        soLuong: item.soLuong || 0,
+        hanhTinh: item.hanhTinh || '',
+        setKichHoat: item.setKichHoat || '',
+        soSaoPhaLe: item.soSaoPhaLe || 0,
+        soSaoPhaLeCuongHoa: item.soSaoPhaLeCuongHoa || 0,
+        soCap: item.soCap || 0,
+        hanSuDung: item.hanSuDung || 0,
+        sucManhYeuCau: item.sucManhYeuCau?.toString() || '0', // long → string
+        linkTexture: item.linkTexture || '',
+        viTri: item.viTri || '',
         chiso: chisoObj,
         user: user,
       });
     });
 
-    return await this.itemService.saveAll(itemsToSave);
+    try {
+      return await this.itemService.saveAll(itemsToSave);
+    } catch (e) {
+      console.error('Lỗi save items:', e);
+      throw new HttpException(`Lỗi khi lưu item: ${e.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
