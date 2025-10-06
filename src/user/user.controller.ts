@@ -286,19 +286,29 @@ export class UserController {
   @Post('useItemWeb')
   async useItemWeb(@Body() body: { username: string; itemId: number }) {
     const { username, itemId } = body;
-    
-    const user = await this.userService.findByUsername(username);
-    if (!user) throw new NotFoundException('User không tồn tại!');
 
-    const idx = user.danhSachVatPhamWeb.indexOf(itemId);
-    if (idx === -1) {
-      throw new BadRequestException(`User không có item ${itemId}`);
+    try {
+      const user = await this.userService.findByUsername(username);
+      if (!user) throw new NotFoundException('User không tồn tại!');
+
+      console.log('User before:', user);
+
+      const itemIdNumber = Number(itemId);
+      const idx = user.danhSachVatPhamWeb.indexOf(itemIdNumber);
+      if (idx === -1) {
+        throw new BadRequestException(`User không có item ${itemIdNumber}`);
+      }
+
+      user.danhSachVatPhamWeb.splice(idx, 1);
+      await this.userService.saveUser(user);
+
+      console.log('User after:', user);
+
+      return `Đã sử dụng item ${itemIdNumber} cho user ${username}`;
+    } catch (e) {
+      console.error('Error in useItemWeb:', e);
+      throw e;
     }
-
-    user.danhSachVatPhamWeb.splice(idx, 1);
-    await this.userService.saveUser(user);
-
-    return `Đã sử dụng item ${itemId} cho user ${username}`;
   }
 
   // controller cho admin

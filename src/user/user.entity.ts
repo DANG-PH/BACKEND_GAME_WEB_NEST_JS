@@ -49,7 +49,7 @@ export class User {
   @Column({ default: false })
   coDeTu: boolean;
 
-  @Column('simple-json', { nullable: true , default: []})
+  @Column('simple-json', { nullable: true })
   danhSachVatPhamWeb: number[];
 
   // Quan hệ 1 User nhiều Item
