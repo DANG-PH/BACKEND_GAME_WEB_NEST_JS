@@ -3,9 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
+import { AuthModule } from '../auth/auth.module'; // thêm module auth
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])], // Kết nối entity User
+  imports: [TypeOrmModule.forFeature([User]), AuthModule], // Kết nối entity User
   providers: [UserService],                  // Service sẽ được inject
   controllers: [UserController],            // Controller xử lý API
   exports: [UserService],

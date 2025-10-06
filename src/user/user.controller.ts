@@ -14,11 +14,18 @@ import {
 import { UserService } from './user.service';
 import { User } from './user.entity';
 import { DeTu } from '../detu/detu.entity';
+import { LoginDto } from 'src/dto/login.dto';
+import { AuthService } from 'src/auth/auth.service';
 import * as bcrypt from 'bcrypt';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UseGuards, Request} from '@nestjs/common';
 
 @Controller('api/auth')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private authService: AuthService
+  ) {}
 
   // ========== REGISTER ==========
   @Post('register')
@@ -31,22 +38,60 @@ export class UserController {
   }
 
   // ========== LOGIN ==========
+  // @Post('login')
+  // async login(@Body() user: User): Promise<LoginDto> {
+  //   const found = await this.userService.findByUsername(user.username);
+  //   if (!found) {
+  //     throw new UnauthorizedException("sai tk mk");
+  //   }
+  //   const isMatch = await bcrypt.compare(user.password, found.password);
+  //   if (!isMatch) {
+  //     throw new UnauthorizedException('Sai tài khoản hoặc mật khẩu');
+  //   }
+  //   if (!found.daVaoTaiKhoanLanDau) {
+  //     found.daVaoTaiKhoanLanDau = true;
+  //     await this.userService.saveUser(found);
+  //   }
+  //   const {password, ...result} = found;
+  //   return result;
+  // }
+
   @Post('login')
-  async login(@Body() user: User): Promise<User> {
+  async login(@Body() user: User): Promise<{ access_token: string }> {
     const found = await this.userService.findByUsername(user.username);
-    if (!found) {
-      throw new UnauthorizedException("sai tk mk");
-    }
+    if (!found) throw new UnauthorizedException('Sai tk mk');
+
     const isMatch = await bcrypt.compare(user.password, found.password);
-    if (!isMatch) {
-      throw new UnauthorizedException('Sai tài khoản hoặc mật khẩu');
-    }
+    if (!isMatch) throw new UnauthorizedException('Sai tk mk');
+
     if (!found.daVaoTaiKhoanLanDau) {
       found.daVaoTaiKhoanLanDau = true;
       await this.userService.saveUser(found);
     }
-    return found;
+
+    return this.authService.login(found); // trả JWT
   }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@Request() req) {
+    const user = await this.userService.findByUsername(req.user.username);
+    if (!user) throw new NotFoundException('User không tồn tại');
+
+    // chắc chắn user không null
+    const { password, ...result } = user;
+    return result;
+  }
+
+  // req = {
+  //   headers: { authorization: 'Bearer <token>' },
+  //   body: { username: 'dang', password: '123' },
+  //   params: { id: '14' },
+  //   query: { page: '1' },
+  //   cookies: { sessionId: 'abc' },
+  //   user: undefined // mặc định chưa có gì
+  // }
+  
 
   // ========== SAVE GAME ==========
   @Post('saveGame')
