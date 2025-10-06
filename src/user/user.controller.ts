@@ -284,7 +284,9 @@ export class UserController {
 
   // ========== USE ITEM WEB ==========
   @Post('useItemWeb')
-  async useItemWeb(@Query('username') username: string, @Query('itemId') itemId: number) {
+  async useItemWeb(@Body() body: { username: string; itemId: number }) {
+    const { username, itemId } = body;
+    
     const user = await this.userService.findByUsername(username);
     if (!user) throw new NotFoundException('User không tồn tại!');
 
