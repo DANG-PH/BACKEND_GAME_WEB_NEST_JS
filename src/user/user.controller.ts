@@ -91,7 +91,7 @@ export class UserController {
   //   cookies: { sessionId: 'abc' },
   //   user: undefined // mặc định chưa có gì
   // }
-  
+
 
   // ========== SAVE GAME ==========
   @Post('saveGame')
@@ -216,7 +216,7 @@ export class UserController {
       throw new BadRequestException({ error: 'Số tiền phải lớn hơn 0!' });
     }
 
-    found.vangNapTuWeb += amount;
+    found.vangNapTuWeb = Number(found.vangNapTuWeb) + amount;
     await this.userService.saveUser(found);
 
     return {
@@ -236,7 +236,7 @@ export class UserController {
       throw new BadRequestException({ error: 'Số tiền phải lớn hơn 0!' });
     }
 
-    found.ngocNapTuWeb += amount;
+    found.ngocNapTuWeb = Number(found.ngocNapTuWeb) + amount;
     await this.userService.saveUser(found);
 
     return {
