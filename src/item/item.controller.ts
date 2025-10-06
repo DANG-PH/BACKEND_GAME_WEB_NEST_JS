@@ -82,13 +82,20 @@ export class ItemController {
     await this.itemService.deleteByUser(user);
 
     const itemsToSave = items.map(item => {
-      // Parse chiso JSON string → object
-      let chisoObj = {};
+      // Luôn stringify chiso
+      let chisoString = '[]'; // mặc định là mảng rỗng
       if (item.chiso) {
         try {
-          chisoObj = JSON.parse(item.chiso);
+          if (typeof item.chiso === 'string') {
+            // nếu client đã gửi string JSON
+            JSON.parse(item.chiso); // thử parse để chắc chắn hợp lệ
+            chisoString = item.chiso;
+          } else {
+            // nếu client gửi object/array
+            chisoString = JSON.stringify(item.chiso);
+          }
         } catch(e) {
-          chisoObj = {};
+          chisoString = '[]';
         }
       }
 
@@ -107,7 +114,7 @@ export class ItemController {
         sucManhYeuCau: item.sucManhYeuCau?.toString() || '0', // long → string
         linkTexture: item.linkTexture || '',
         viTri: item.viTri || '',
-        chiso: chisoObj,
+        chiso: chisoString, // LƯU LUÔN LÀ STRING
         user: user,
       });
     });

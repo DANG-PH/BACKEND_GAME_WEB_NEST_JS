@@ -49,8 +49,8 @@ export class Item {
   @Column()
   viTri: string;
 
-  @Column('json')
-  chiso: any;
+  @Column('text', { nullable: true })
+  chiso: string; // lưu dạng JSON string
 
   @ManyToOne(() => User, user => user.items, { nullable: false })
   @JoinColumn({ name: 'user_id' })

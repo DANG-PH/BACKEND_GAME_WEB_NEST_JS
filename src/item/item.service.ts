@@ -11,11 +11,26 @@ export class ItemService {
     private readonly itemRepository: Repository<Item>,
   ) {}
 
-  async getItemsByUser(user: User): Promise<Item[]> {
+  async getItemsByUser(user: User): Promise<any[]> {
     console.log('Gọi getItemsByUser cho user:', user.username);
     const items = await this.itemRepository.find({ where: { user } });
-    console.log('Items trả về:', items);
-    return items;
+
+    // parse chiso
+    const parsedItems = items.map(item => {
+      let chisoParsed = [];
+      try {
+        chisoParsed = item.chiso ? JSON.parse(item.chiso) : [];
+      } catch (e) {
+        chisoParsed = [];
+      }
+      return {
+        ...item,
+        chiso: chisoParsed
+      };
+    });
+
+    console.log('Items trả về:', parsedItems);
+    return parsedItems;
   }
 
 
