@@ -12,8 +12,12 @@ export class ItemService {
   ) {}
 
   async getItemsByUser(user: User): Promise<Item[]> {
-    return this.itemRepository.find({ where: { user } });
+    console.log('Gọi getItemsByUser cho user:', user.username);
+    const items = await this.itemRepository.find({ where: { user } });
+    console.log('Items trả về:', items);
+    return items;
   }
+
 
   async getItemsByUserId(userId: number): Promise<Item[]> {
     return this.itemRepository.find({ where: { user: { id: userId } } });

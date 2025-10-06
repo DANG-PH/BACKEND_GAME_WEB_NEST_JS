@@ -25,7 +25,7 @@ export class Item {
   @Column()
   hanhTinh: string;
 
-  @Column()
+  @Column({ nullable: true })
   setKichHoat: string;
 
   @Column()
