@@ -17,34 +17,27 @@ export class ItemService {
   async getItemsByUser(user: User): Promise<any[]> {
     console.log('Gọi getItemsByUser cho user:', user.username);
 
-    // user thật từ DB
     const dbUser = await this.userRepository.findOne({ where: { username: user.username } });
     if (!dbUser) {
-      console.log('Không tìm thấy user trong DB');
-      return [];
+        console.log('Không tìm thấy user trong DB');
+        return [];
     }
 
     const items = await this.itemRepository.find({
-      where: { user: { id: dbUser.id } },
+        where: { user: { id: dbUser.id } },
     });
     console.log('Items lấy bằng id:', items);
 
-    const parsedItems = items.map(item => {
-      let chisoParsed = [];
-      try {
-        chisoParsed = item.chiso ? JSON.parse(item.chiso) : [];
-      } catch (e) {
-        chisoParsed = [];
-      }
-      return {
+    // Giữ chiso nguyên string, không parse
+    const resultItems = items.map(item => ({
         ...item,
-        chiso: chisoParsed,
-      };
-    });
+        chiso: item.chiso || '[]', 
+    }));
 
-    console.log('Items trả về:', parsedItems);
-    return parsedItems;
+    console.log('Items trả về (JSON string):', resultItems);
+    return resultItems;
   }
+
 
 
   async getItemsByUserId(userId: number): Promise<Item[]> {
