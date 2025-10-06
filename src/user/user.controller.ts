@@ -212,7 +212,51 @@ export class UserController {
     return this.userService.getTop10UsersByVang();
   }
 
-  // ========== BAN USER ==========
+  // ========== ADD ITEM WEB ==========
+  @Post('addItemWeb')
+  async addItemWeb(@Body() body: { username: string, itemId: number }) {
+    const { username, itemId } = body;
+    if (!username || itemId == null) throw new BadRequestException('username hoặc itemId không hợp lệ');
+
+    const user = await this.userService.findByUsername(username);
+    if (!user) throw new NotFoundException('User không tồn tại!');
+
+    if (!user.danhSachVatPhamWeb) user.danhSachVatPhamWeb = [];
+    user.danhSachVatPhamWeb.push(itemId);
+
+    await this.userService.saveUser(user);
+
+    return `Đã thêm item ${itemId} cho user ${username}`;
+  }
+
+  // ========== GET ITEMS WEB ==========
+  @Get('getItemsWeb')
+  async getItemsWeb(@Query('username') username: string) {
+    const user = await this.userService.findByUsername(username);
+    if (!user) throw new NotFoundException('User không tồn tại!');
+    return user.danhSachVatPhamWeb;
+  }
+
+  // ========== USE ITEM WEB ==========
+  @Post('useItemWeb')
+  async useItemWeb(@Query('username') username: string, @Query('itemId') itemId: number) {
+    const user = await this.userService.findByUsername(username);
+    if (!user) throw new NotFoundException('User không tồn tại!');
+
+    const idx = user.danhSachVatPhamWeb.indexOf(itemId);
+    if (idx === -1) {
+      throw new BadRequestException(`User không có item ${itemId}`);
+    }
+
+    user.danhSachVatPhamWeb.splice(idx, 1);
+    await this.userService.saveUser(user);
+
+    return `Đã sử dụng item ${itemId} cho user ${username}`;
+  }
+
+  // controller cho admin
+
+    // ========== BAN USER ==========
   @Post('banUser')
   async banUser(@Query('username') username: string, @Query('adminName') adminName: string) {
     const admin = await this.userService.findByUsername(adminName);
@@ -265,45 +309,15 @@ export class UserController {
     return `Đã unban user ${username}`;
   }
 
-  // ========== ADD ITEM WEB ==========
-  @Post('addItemWeb')
-  async addItemWeb(@Body() body: { username: string, itemId: number }) {
-    const { username, itemId } = body;
-    if (!username || itemId == null) throw new BadRequestException('username hoặc itemId không hợp lệ');
-
-    const user = await this.userService.findByUsername(username);
-    if (!user) throw new NotFoundException('User không tồn tại!');
-
-    if (!user.danhSachVatPhamWeb) user.danhSachVatPhamWeb = [];
-    user.danhSachVatPhamWeb.push(itemId);
-
-    await this.userService.saveUser(user);
-
-    return `Đã thêm item ${itemId} cho user ${username}`;
-  }
-
-  // ========== GET ITEMS WEB ==========
-  @Get('getItemsWeb')
-  async getItemsWeb(@Query('username') username: string) {
-    const user = await this.userService.findByUsername(username);
-    if (!user) throw new NotFoundException('User không tồn tại!');
-    return user.danhSachVatPhamWeb;
-  }
-
-  // ========== USE ITEM WEB ==========
-  @Post('useItemWeb')
-  async useItemWeb(@Query('username') username: string, @Query('itemId') itemId: number) {
-    const user = await this.userService.findByUsername(username);
-    if (!user) throw new NotFoundException('User không tồn tại!');
-
-    const idx = user.danhSachVatPhamWeb.indexOf(itemId);
-    if (idx === -1) {
-      throw new BadRequestException(`User không có item ${itemId}`);
+  @Get('getUser')
+  async getUser(@Query('username') username: string, @Query('adminName') adminName: string) {
+    const admin = await this.userService.findByUsername(adminName);
+    if (!admin || admin.role !== 'ADMIN') {
+         throw new ForbiddenException('Bạn không có quyền!');
     }
-
-    user.danhSachVatPhamWeb.splice(idx, 1);
-    await this.userService.saveUser(user);
-
-    return `Đã sử dụng item ${itemId} cho user ${username}`;
+    const user = await this.userService.findByUsername(username);
+    if (!user) throw new NotFoundException('Không tìm thấy user!');
+    
+    return user; 
   }
 }
