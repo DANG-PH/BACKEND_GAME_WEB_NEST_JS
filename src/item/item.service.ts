@@ -9,13 +9,25 @@ export class ItemService {
   constructor(
     @InjectRepository(Item)
     private readonly itemRepository: Repository<Item>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async getItemsByUser(user: User): Promise<any[]> {
     console.log('Gọi getItemsByUser cho user:', user.username);
-    const items = await this.itemRepository.find({ where: { user } });
 
-    // parse chiso
+    // user thật từ DB
+    const dbUser = await this.userRepository.findOne({ where: { username: user.username } });
+    if (!dbUser) {
+      console.log('Không tìm thấy user trong DB');
+      return [];
+    }
+
+    const items = await this.itemRepository.find({
+      where: { user: dbUser },
+    });
+
     const parsedItems = items.map(item => {
       let chisoParsed = [];
       try {
@@ -25,7 +37,7 @@ export class ItemService {
       }
       return {
         ...item,
-        chiso: chisoParsed
+        chiso: chisoParsed,
       };
     });
 
