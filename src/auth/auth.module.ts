@@ -10,7 +10,7 @@ import { AuthService } from './auth.service';
     }),
   ],
   providers: [AuthService],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
 
