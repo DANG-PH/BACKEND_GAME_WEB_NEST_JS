@@ -7,14 +7,17 @@ import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    // PassportModule.register({ defaultStrategy: 'jwt' }), Dòng này thì @UseGuards(AuthGuard())  → Nest sẽ hiểu bạn đang dùng AuthGuard('jwt'), Nếu không có dòng này, bạn phải ghi AuthGuard('jwt') ở mọi nơi.
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'secretKey', // key bí mật
+      secret: process.env.JWT_SECRET || 'haidang2809', // key bí mật
       signOptions: { expiresIn: '1h' },            // token sống 1h
     }),
-  ],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard],
-  exports: [AuthService, JwtModule],
+    // Nó có 2 việc chính:
+    // Tạo token khi người dùng đăng nhập
+    // Kiểm tra token khi người dùng gọi API
+  ], // các module khác mà AuthModule cần
+  providers: [AuthService, JwtStrategy, JwtAuthGuard], // các service, guard, strategy mà AuthModule cung cấp
+  exports: [AuthService, JwtModule], // những gì muốn chia sẻ cho module khác
 })
 export class AuthModule {}
 

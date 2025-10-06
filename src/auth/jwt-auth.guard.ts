@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {}
+export class JwtAuthGuard extends AuthGuard('jwt-1gio') {}
 
 // Đây là guard để bảo vệ route.
 
@@ -23,3 +23,16 @@ export class JwtAuthGuard extends AuthGuard('jwt') {}
 // Lấy token từ header (theo config trong JwtStrategy)
 
 // Gọi JwtStrategy.validate(payload) để verify token
+
+
+// Nếu không viết 'jwt-1gio'
+
+// Nếu em bỏ tên đi, thì mặc định tên strategy sẽ là "jwt".
+// Ví dụ:
+
+// export class JwtStrategy extends PassportStrategy(Strategy) { ... }
+
+
+// thì sẽ tương đương với AuthGuard('jwt').
+
+// Do đó, nếu em muốn dùng AuthGuard() mà không ghi gì (AuthGuard()), thì trong module em phải đăng ký PassportModule.register({ defaultStrategy: 'jwt' }).
