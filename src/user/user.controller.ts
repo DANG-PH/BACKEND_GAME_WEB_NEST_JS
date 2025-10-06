@@ -310,7 +310,7 @@ export class UserController {
   }
 
   @Get('getUser')
-  async getUser(@Query('username') username: string, @Query('adminName') adminName: string) {
+  async getUser(@Body('username') username: string, @Body('adminName') adminName: string) {
     const admin = await this.userService.findByUsername(adminName);
     if (!admin || admin.role !== 'ADMIN') {
          throw new ForbiddenException('Bạn không có quyền!');
