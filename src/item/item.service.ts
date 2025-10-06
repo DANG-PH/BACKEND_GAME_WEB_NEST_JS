@@ -25,8 +25,9 @@ export class ItemService {
     }
 
     const items = await this.itemRepository.find({
-      where: { user: dbUser },
+      where: { user: { id: dbUser.id } },
     });
+    console.log('Items lấy bằng id:', items);
 
     const parsedItems = items.map(item => {
       let chisoParsed = [];
