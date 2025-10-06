@@ -106,7 +106,7 @@ export class ItemController {
         moTa: item.moTa || '',
         soLuong: item.soLuong || 0,
         hanhTinh: item.hanhTinh || '',
-        setKichHoat: item.setKichHoat || '',
+        setKichHoat: item.setKichHoat || null,
         soSaoPhaLe: item.soSaoPhaLe || 0,
         soSaoPhaLeCuongHoa: item.soSaoPhaLeCuongHoa || 0,
         soCap: item.soCap || 0,
